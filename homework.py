@@ -31,7 +31,7 @@ class Record:
     def __init__(self,
                  amount: float,
                  comment: str,
-                 date = None) -> None:
+                 date=None) -> None:
         try:
             date_format = '%d.%m.%Y'
             if (type(date) is str):
@@ -64,11 +64,17 @@ class CashCalculator(Calculator):
             balance = balance / self.EURO_RATE
             format_str_currency = "Euro"
         if balance > 0:
-            return f"На сегодня осталось {round(balance, 2)} {format_str_currency}"
+            return (
+                "На сегодня осталось "
+                f"{round(balance, 2)} {format_str_currency}"
+            )
         elif balance == 0:
             return "Денег нет, держись"
         else:
-            return f"Денег нет, держись: твой долг - {-round(balance, 2)} {format_str_currency}"
+            return (
+                "Денег нет, держись: твой долг - "
+                f"{-round(balance, 2)} {format_str_currency}"
+            )
 
 
 class CaloriesCalculator(Calculator):
@@ -76,6 +82,9 @@ class CaloriesCalculator(Calculator):
     def get_calories_remained(self):
         balance = round(self.limit - self.get_today_stats())
         if (balance > 0):
-            return f"Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {balance} кКал"
+            return (
+                "Сегодня можно съесть что-нибудь ещё, но с общей калорийностью"
+                f" не более {balance} кКал"
+            )
         else:
             return "Хватит есть!"
