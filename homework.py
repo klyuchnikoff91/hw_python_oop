@@ -1,4 +1,5 @@
 import datetime as dt
+from collections import namedtuple
 
 
 class Calculator:
@@ -46,27 +47,28 @@ class CashCalculator(Calculator):
     """Ещё калькулятор"""
     USD_RATE = 72.76
     EURO_RATE = 86.15
+    rec = namedtuple('rec', ['value', 'form'])
     CURRENCY_RATE = {
-        'rub': (1, 'руб'),
-        'usd': (USD_RATE, 'USD'),
-        'eur': (EURO_RATE, 'Euro'),
+        'rub': rec(1, 'руб'),
+        'usd': rec(USD_RATE, 'USD'),
+        'eur': rec(EURO_RATE, 'Euro'),
     }
 
     def get_today_cash_remained(self, currency):
-        balance = self.get_balance()
-        balance = round(balance / self.CURRENCY_RATE[currency][0], 2)
+        balance = self.get_balance() / self.CURRENCY_RATE[currency].value
         if balance > 0:
+            balance = round(balance, 2)
             return (
                 "На сегодня осталось "
-                f"{balance} {self.CURRENCY_RATE[currency][1]}"
+                f"{balance} {self.CURRENCY_RATE[currency].form}"
             )
         elif balance == 0:
             return "Денег нет, держись"
         else:
-            balance = abs(balance)
+            balance = abs(round(balance, 2))
             return (
                 "Денег нет, держись: твой долг - "
-                f"{balance} {self.CURRENCY_RATE[currency][1]}"
+                f"{balance} {self.CURRENCY_RATE[currency].form}"
             )
 
 
