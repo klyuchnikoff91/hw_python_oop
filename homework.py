@@ -12,10 +12,7 @@ class Calculator:
 
     def get_today_stats(self):
         today = dt.date.today()
-        today_amount = 0
-        for r in self.records:
-            if (r.date == today):
-                today_amount += r.amount
+        today_amount = sum(r.amount for r in self.records if r.date == today)
         return today_amount
 
     def get_week_stats(self):
@@ -54,8 +51,8 @@ class Record:
 
 class CashCalculator(Calculator):
     """Ещё один скучный калькулятор"""
-    USD_RATE = 73.13
-    EURO_RATE = 86.47
+    USD_RATE = 72.76
+    EURO_RATE = 86.15
 
     def get_today_cash_remained(self, currency):
         balance = self.limit - self.get_today_stats()
