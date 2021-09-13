@@ -47,7 +47,7 @@ class CashCalculator(Calculator):
     """Ещё калькулятор"""
     USD_RATE = 72.76
     EURO_RATE = 86.15
-    rec = namedtuple('rec', ['value', 'form'])
+    rec = namedtuple('rec', ['value', 'view'])
     CURRENCY_RATE = {
         'rub': rec(1, 'руб'),
         'usd': rec(USD_RATE, 'USD'),
@@ -55,12 +55,17 @@ class CashCalculator(Calculator):
     }
 
     def get_today_cash_remained(self, currency):
-        balance = self.get_balance() / self.CURRENCY_RATE[currency].value
+        balance = self.get_balance()
+        if currency == 'usd':
+            # Нельзя обратиться через словарь, тогда зачем он нужен?
+            balance = balance / self.USD_RATE
+        if currency == 'eur':
+            balance = balance / self.EURO_RATE
         if balance > 0:
             balance = round(balance, 2)
             return (
                 "На сегодня осталось "
-                f"{balance} {self.CURRENCY_RATE[currency].form}"
+                f"{balance} {self.CURRENCY_RATE[currency].view}"
             )
         elif balance == 0:
             return "Денег нет, держись"
@@ -68,7 +73,7 @@ class CashCalculator(Calculator):
             balance = abs(round(balance, 2))
             return (
                 "Денег нет, держись: твой долг - "
-                f"{balance} {self.CURRENCY_RATE[currency].form}"
+                f"{balance} {self.CURRENCY_RATE[currency].view}"
             )
 
 
