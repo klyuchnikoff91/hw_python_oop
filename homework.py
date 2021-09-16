@@ -1,5 +1,4 @@
 import datetime as dt
-from collections import namedtuple
 
 
 class Calculator:
@@ -35,7 +34,7 @@ class Record:
                  comment,
                  date=None):
         date_format = '%d.%m.%Y'
-        if (date is None):
+        if date is None:
             self.date = dt.date.today()
         else:
             self.date = dt.datetime.strptime(date, date_format).date()
@@ -45,34 +44,39 @@ class Record:
 
 class CashCalculator(Calculator):
     """Ещё калькулятор"""
-    USD_RATE = 72.76
     EURO_RATE = 86.15
+    USD_RATE = 72.76
+
+    @staticmethod
+    def raise_unsupported_currency(currency):
+        raise ValueError(f'{currency} not supported')
+
 
     def get_today_cash_remained(self, currency):
-        rec = namedtuple('rec', ['value', 'view'])
-        balance = self.get_balance()
-        # Костыль в виде словаря, иначе не проходит автотест
-        # Словарю место в свойствах класса без отдельных RATE свойств
         CURRENCY_RATE = {
-            'rub': rec(balance, 'руб'),
-            'usd': rec(balance / self.USD_RATE, 'USD'),
-            'eur': rec(balance / self.EURO_RATE, 'Euro'),
+            'rub': (1, 'руб'),
+            'eur': (self.EURO_RATE, 'Euro'),
+            'usd': (self.USD_RATE, 'USD'),
         }
-        balance = CURRENCY_RATE[currency].value
+        if currency not in CURRENCY_RATE.keys():
+            self.raise_unsupported_currency(currency)
+        balance = self.get_balance()
+        if balance == 0:
+            return "Денег нет, держись"
+        rate, view = CURRENCY_RATE[currency]
+        if rate == 0:
+            raise ArithmeticError()
         if balance > 0:
-            balance = round(balance, 2)
+            balance = round(balance / rate, 2)
             return (
                 "На сегодня осталось "
-                f"{balance} {CURRENCY_RATE[currency].view}"
+                f"{balance} {view}"
             )
-        elif balance == 0:
-            return "Денег нет, держись"
-        else:
-            balance = abs(round(balance, 2))
-            return (
+        balance = abs(round(balance / rate, 2))
+        return (
                 "Денег нет, держись: твой долг - "
-                f"{balance} {CURRENCY_RATE[currency].view}"
-            )
+                f"{balance} {view}"
+               )
 
 
 class CaloriesCalculator(Calculator):
@@ -84,5 +88,4 @@ class CaloriesCalculator(Calculator):
                 "Сегодня можно съесть что-нибудь ещё, но с общей калорийностью"
                 f" не более {balance} кКал"
             )
-        else:
-            return "Хватит есть!"
+        return "Хватит есть!"
