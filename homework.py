@@ -44,8 +44,14 @@ class Record:
 
 class CashCalculator(Calculator):
     """Ещё калькулятор"""
+    RUBLE_RATE = 1
     EURO_RATE = 86.15
     USD_RATE = 72.76
+    CURRENCY_RATE = {
+            'rub': ('руб', 'RUBLE_RATE'),
+            'eur': ('Euro', 'EURO_RATE'),
+            'usd': ('USD', 'USD_RATE'),
+        }
 
     @staticmethod
     def raise_unsupported_currency(currency):
@@ -53,17 +59,13 @@ class CashCalculator(Calculator):
 
 
     def get_today_cash_remained(self, currency):
-        CURRENCY_RATE = {
-            'rub': (1, 'руб'),
-            'eur': (self.EURO_RATE, 'Euro'),
-            'usd': (self.USD_RATE, 'USD'),
-        }
-        if currency not in CURRENCY_RATE.keys():
+        if currency not in self.CURRENCY_RATE.keys():
             self.raise_unsupported_currency(currency)
         balance = self.get_balance()
         if balance == 0:
             return "Денег нет, держись"
-        rate, view = CURRENCY_RATE[currency]
+        view, name_var_rate = self.CURRENCY_RATE[currency]
+        rate = self.__getattribute__(name_var_rate)
         if rate == 0:
             raise ArithmeticError()
         if balance > 0:
